@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A multilingual engineering portfolio case study for the ReguGuard local compliance-readiness MVP.">
+    <meta name="theme-color" content="#10172b">
+    <title>ReguGuard — Engineering Portfolio</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f5f7ff;
+        --muted: #aab4ca;
+        --line: rgb(255 255 255 / 13%);
+        --panel: rgb(255 255 255 / 6%);
+        --blue: #a8b8ff;
+        --mint: #a7f0d2;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+      }
+      * { box-sizing: border-box; }
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(ellipse at 82% 18%, rgb(62 82 164 / 28%), transparent 34rem),
+          radial-gradient(ellipse at 10% 100%, rgb(46 131 111 / 17%), transparent 34rem),
+          #10172b;
+      }
+      button, a { font: inherit; }
+      button:focus-visible, a:focus-visible { outline: 3px solid var(--mint); outline-offset: 3px; }
+      .toolbar {
+        position: fixed;
+        z-index: 3;
+        inset: 0 0 auto;
+        display: flex;
+        min-height: 68px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px clamp(16px, 4vw, 56px);
+        border-bottom: 1px solid var(--line);
+        background: rgb(16 23 43 / 88%);
+        backdrop-filter: blur(14px);
+      }
+      .brand { display: flex; align-items: center; gap: 11px; font-size: 15px; font-weight: 750; letter-spacing: -.3px; }
+      .brand-mark {
+        display: grid;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        border: 1px solid rgb(255 255 255 / 28%);
+        border-radius: 12px;
+        background: linear-gradient(145deg, #415bc2, #253b93);
+        color: white;
+        font-size: 21px;
+        font-weight: 850;
+      }
+      .controls { display: flex; align-items: center; gap: 8px; }
+      .control, .language-button {
+        min-height: 38px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel);
+        color: var(--ink);
+        cursor: pointer;
+      }
+      .language-button[aria-pressed="true"] { border-color: rgb(168 184 255 / 80%); background: rgb(115 137 226 / 20%); }
+      .control:hover, .language-button:hover { background: rgb(255 255 255 / 12%); }
+      main { min-height: 100vh; padding: 92px 20px 96px; }
+      .deck { position: relative; width: min(1120px, 100%); min-height: min(690px, calc(100vh - 190px)); margin: 0 auto; }
+      .slide {
+        display: none;
+        min-height: min(690px, calc(100vh - 190px));
+        padding: clamp(24px, 6vw, 72px);
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: linear-gradient(145deg, rgb(255 255 255 / 7%), rgb(255 255 255 / 2%));
+        box-shadow: 0 28px 90px rgb(0 0 0 / 22%);
+      }
+      .slide.active { display: flex; flex-direction: column; justify-content: center; animation: enter .28s ease-out; }
+      @keyframes enter { from { opacity: .35; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+      .eyebrow { margin: 0 0 18px; color: var(--mint); font-size: 12px; font-weight: 750; letter-spacing: 2px; text-transform: uppercase; }
+      h1, h2, h3, p { margin-top: 0; }
+      h1 { max-width: 820px; margin-bottom: 18px; font-size: clamp(42px, 7vw, 78px); line-height: .99; letter-spacing: -3.5px; }
+      h2 { max-width: 880px; margin-bottom: 28px; font-size: clamp(32px, 5vw, 54px); line-height: 1.05; letter-spacing: -2px; }
+      h3 { margin-bottom: 8px; font-size: 19px; line-height: 1.25; }
+      .lead { max-width: 720px; margin-bottom: 26px; color: var(--muted); font-size: clamp(18px, 2.4vw, 24px); line-height: 1.5; }
+      .small { color: var(--muted); font-size: 14px; line-height: 1.6; }
+      .tag-row { display: flex; flex-wrap: wrap; gap: 9px; margin: 4px 0 22px; }
+      .tag { padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; background: rgb(255 255 255 / 5%); color: #e4e9fb; font-size: 13px; }
+      .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+      .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .card { padding: 20px; border: 1px solid var(--line); border-radius: 17px; background: var(--panel); }
+      .card p:last-child { margin-bottom: 0; }
+      .card p { color: var(--muted); font-size: 15px; line-height: 1.55; }
+      .number { display: block; margin-bottom: 10px; color: var(--mint); font-size: 27px; font-weight: 800; letter-spacing: -1px; }
+      .flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; counter-reset: step; }
+      .flow .card { position: relative; min-height: 170px; padding-top: 48px; }
+      .flow .card::before {
+        counter-increment: step;
+        content: "0" counter(step);
+        position: absolute;
+        inset: 17px auto auto 20px;
+        color: var(--mint);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1px;
+      }
+      .architecture { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 12px; margin: 10px 0 20px; }
+      .arch-box { min-height: 130px; display: flex; flex-direction: column; justify-content: center; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
+      .arch-box strong { margin-bottom: 8px; font-size: 18px; }
+      .arch-box span { color: var(--muted); font-size: 14px; line-height: 1.5; }
+      .arrow { color: var(--mint); font-size: 25px; }
+      ul { display: grid; gap: 11px; margin: 0; padding-left: 21px; color: var(--muted); line-height: 1.55; }
+      li::marker { color: var(--mint); }
+      .callout { margin-top: 18px; padding: 15px 18px; border-left: 3px solid var(--mint); border-radius: 0 12px 12px 0; background: rgb(167 240 210 / 8%); color: #e9fff7; line-height: 1.55; }
+      .closing-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+      .closing-links a { padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); text-decoration: none; }
+      .closing-links a:hover { background: var(--panel); }
+      .footer-controls {
+        position: fixed;
+        z-index: 2;
+        inset: auto 0 0;
+        display: flex;
+        min-height: 72px;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        border-top: 1px solid var(--line);
+        background: rgb(16 23 43 / 88%);
+        backdrop-filter: blur(14px);
+      }
+      #slide-counter { min-width: 72px; color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+      .progress { position: fixed; z-index: 4; inset: auto auto 0 0; height: 3px; width: 0; background: var(--mint); transition: width .2s ease; }
+      @media (max-width: 720px) {
+        .toolbar { min-height: 60px; padding-inline: 12px; }
+        .brand { font-size: 13px; }
+        .brand-mark { width: 32px; height: 32px; }
+        .control, .language-button { min-height: 35px; padding: 6px 9px; font-size: 13px; }
+        main { padding: 78px 12px 84px; }
+        .deck, .slide { min-height: calc(100vh - 162px); }
+        .slide { padding: 28px 22px; border-radius: 20px; }
+        h1 { letter-spacing: -2px; }
+        h2 { letter-spacing: -1px; }
+        .grid, .grid.three, .flow { grid-template-columns: 1fr; }
+        .flow .card { min-height: 0; }
+        .architecture { grid-template-columns: 1fr; }
+        .arch-box { min-height: 92px; }
+        .arrow { justify-self: center; transform: rotate(90deg); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: .01ms !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      }
+      @media print {
+        @page { size: landscape; margin: 0; }
+        :root { color-scheme: light; }
+        body { min-width: 0; background: #10172b !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+        .toolbar, .footer-controls, .progress { display: none !important; }
+        main { padding: 0; }
+        .deck { width: auto; min-height: 0; margin: 0; }
+        .slide, .slide.active {
+          display: flex !important;
+          width: 100vw;
+          height: 100vh;
+          min-height: 0;
+          padding: 9vh 9vw;
+          border: 0;
+          border-radius: 0;
+          box-shadow: none;
+          break-after: page;
+          page-break-after: always;
+        }
+        .slide:last-child { break-after: auto; page-break-after: auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="toolbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">R</span><span>ReguGuard <span id="header-label">Engineering Portfolio</span></span></div>
+      <nav class="controls" aria-label="Presentation language">
+        <button class="language-button" type="button" data-language="en" aria-pressed="true">EN</button>
+        <button class="language-button" type="button" data-language="de" aria-pressed="false">DE</button>
+        <button class="language-button" type="button" data-language="uz" aria-pressed="false">UZ</button>
+      </nav>
+    </header>
+    <main>
+      <div id="deck" class="deck" aria-live="polite"></div>
+    </main>
+    <nav class="footer-controls" aria-label="Slide navigation">
+      <button id="previous" class="control" type="button" aria-label="Previous slide">←</button>
+      <span id="slide-counter" aria-live="polite">01 / 08</span>
+      <button id="next" class="control" type="button" aria-label="Next slide">→</button>
+      <button id="print" class="control" type="button">Print / PDF</button>
+    </nav>
+    <div id="progress" class="progress" aria-hidden="true"></div>
+    <script>
+      const translations = {
+        en: {
+          header: "Engineering Portfolio",
+          previous: "Previous slide", next: "Next slide", print: "Print / PDF",
+          slides: [
+            {
+              eyebrow: "ENGINEERING PORTFOLIO · PROJECT CASE STUDY",
+              title: "Compliance readiness, built with evidence.",
+              lead: "ReguGuard is a local-first prototype for reviewing software repositories and surfacing compliance signals for human assessment.",
+              tags: ["Python standard library", "SQLite", "Vanilla JavaScript", "English · German · Uzbek"],
+              note: "A portfolio project demonstrating a complete local workflow—not a production compliance platform."
+            },
+            {
+              eyebrow: "01 · THE PROBLEM",
+              title: "Compliance review needs context—not a magic score.",
+              cards: [
+                ["The challenge", "Repository signals alone do not determine regulatory risk. Intended purpose and who may be affected matter."],
+                ["The product choice", "Collect use-case context, inspect code as untrusted text, and keep people responsible for decisions."],
+                ["The boundary", "Provide a readiness screen—not legal advice, conformity assessment, or certification."]
+              ],
+              note: "The scope is deliberately honest about uncertainty and false positives."
+            },
+            {
+              eyebrow: "02 · END-TO-END WORKFLOW",
+              title: "From local ZIP to a reviewable report.",
+              flow: [
+                ["Set up a workspace", "Create the first owner; authenticate with a local account."],
+                ["Describe intended use", "Capture sector, users, purpose, and consequential-decision context."],
+                ["Scan safely", "Inspect bounded ZIP text files; reject unsafe paths and never execute source."],
+                ["Review and report", "Redacted findings, human decisions, audit events, and printable reports."]
+              ],
+              note: "Raw archive and source files stay in memory during the scan; stored evidence is redacted."
+            },
+            {
+              eyebrow: "03 · SECURITY BY DEFAULT",
+              title: "A small prototype with deliberate guardrails.",
+              architecture: [
+                ["Browser UI", "Three interface languages<br>Session-aware requests"],
+                ["Loopback API", "Authentication · roles<br>CSRF and Origin checks"],
+                ["Local SQLite", "Workspace-scoped records<br>Hash-chained audit events"]
+              ],
+              bullets: [
+                "Scrypt password hashes; expiring server-side sessions; HttpOnly and SameSite cookies.",
+                "ZIP size, entry count, path traversal, symlink, encryption, and expansion limits.",
+                "Inactive-member session revocation; audit verification detects chain edits."
+              ],
+              note: "These local controls are not substitutes for PostgreSQL RLS, a security review, or managed production infrastructure."
+            },
+            {
+              eyebrow: "04 · IMPLEMENTATION",
+              title: "Lean dependencies. Explicit boundaries.",
+              cards: [
+                ["Backend", "Python standard library HTTP server, SQLite, ZIP inspection, deterministic rules."],
+                ["Frontend", "Semantic HTML, responsive CSS, vanilla JavaScript, in-app EN / DE / UZ localization."],
+                ["Quality", "Standard-library unit and HTTP tests; Python compilation; JavaScript syntax checks in CI."]
+              ],
+              callout: "No LLM provider or third-party runtime dependency. Analysis is predictable, limited, and not a full audit.",
+              note: "The technology is intentionally a local MVP; it does not claim to implement the planned enterprise stack."
+            },
+            {
+              eyebrow: "05 · VERIFICATION",
+              title: "Test the behavior that can fail.",
+              cards: [
+                ["15 automated tests", "Analysis, redaction, ZIP protections, migration, authentication, and API workflows."],
+                ["Tenant and role checks", "Cross-workspace access, auditor permissions, admin boundaries, and revoked sessions."],
+                ["Evidence and reports", "Human review, localized printable HTML, SHA-256 metadata, and audit tamper detection."]
+              ],
+              callout: "Observed in browser: workspace setup, admin sign-in and role UI, synthetic ZIP scan, German report.",
+              note: "Passing local tests demonstrates tested prototype behavior; it does not establish production readiness or regulatory compliance."
+            },
+            {
+              eyebrow: "06 · HONEST LIMITATIONS",
+              title: "Useful prototype. Not a production release.",
+              bullets: [
+                "No Java/Spring + React enterprise deployment, PostgreSQL RLS, MFA/OIDC, or encrypted object storage.",
+                "No verified legal knowledge base, validated PII benchmark, PDF/A generation, or independent penetration test.",
+                "Regex detection can miss issues and produce false positives; redaction is not anonymisation.",
+                "Loopback-only local server. Never upload confidential, customer, or real personal data."
+              ],
+              note: "A portfolio presentation should make these constraints visible rather than imply certification or full legal coverage."
+            },
+            {
+              eyebrow: "07 · NEXT MILESTONES",
+              title: "A responsible path from demo to product.",
+              cards: [
+                ["Architecture", "Introduce Spring API, isolated Python worker, PostgreSQL with independently tested tenant RLS."],
+                ["Evidence quality", "Curate a legally reviewed knowledge base and measure PII precision / recall on a documented benchmark."],
+                ["Operations", "Add MFA/OIDC, secrets and key management, backup/restore drills, monitoring, and threat-modelled deployment."]
+              ],
+              closing: "A clear engineering story: privacy-first defaults, testable controls, and honest product boundaries.",
+              links: [["Run locally", "../README.md"], ["Technical brief", "../ReguGuard%20AI%20%E2%80%94%20Texnik%20vazifa%20(TZ)%20v1.0.md"]]
+            }
+          ]
+        },
+        de: {
+          header: "Engineering-Portfolio",
+          previous: "Vorherige Folie", next: "Nächste Folie", print: "Drucken / PDF",
+          slides: [
+            {
+              eyebrow: "ENGINEERING-PORTFOLIO · PROJEKTPORTRÄT",
+              title: "Compliance Readiness – mit nachvollziehbaren Belegen.",
+              lead: "ReguGuard ist ein Local-first-Prototyp, der Software-Repositories prüft und Hinweise für die menschliche Bewertung aufbereitet.",
+              tags: ["Python-Standardbibliothek", "SQLite", "Vanilla JavaScript", "Englisch · Deutsch · Usbekisch"],
+              note: "Ein Portfolio-Projekt mit einem vollständigen lokalen Ablauf – keine produktive Compliance-Plattform."
+            },
+            {
+              eyebrow: "01 · DIE HERAUSFORDERUNG",
+              title: "Compliance braucht Kontext – keinen magischen Score.",
+              cards: [
+                ["Die Herausforderung", "Repository-Signale allein bestimmen kein regulatorisches Risiko. Verwendungszweck und betroffene Personen sind entscheidend."],
+                ["Die Produktentscheidung", "Use-Case-Kontext erfassen, Code als nicht vertrauenswürdigen Text prüfen und Menschen entscheiden lassen."],
+                ["Die Grenze", "Eine indikative Bereitschaftsprüfung anbieten – keine Rechtsberatung, Konformitätsbewertung oder Zertifizierung."]
+              ],
+              note: "Der Umfang benennt Unsicherheiten und mögliche Fehlalarme ausdrücklich."
+            },
+            {
+              eyebrow: "02 · DURCHGÄNGIGER ABLAUF",
+              title: "Vom lokalen ZIP zum prüfbaren Bericht.",
+              flow: [
+                ["Arbeitsbereich einrichten", "Ersten Owner anlegen und mit lokalem Konto anmelden."],
+                ["Verwendungszweck beschreiben", "Branche, Nutzer, Zweck und Einfluss auf folgenreiche Entscheidungen erfassen."],
+                ["Sicher prüfen", "Begrenzte ZIP-Textdateien untersuchen; unsichere Pfade ablehnen und Quellcode nie ausführen."],
+                ["Prüfen und berichten", "Redigierte Hinweise, menschliche Entscheidungen, Audit-Ereignisse und druckbare Berichte."]
+              ],
+              note: "Archiv und Quelldateien bleiben während des Scans im Arbeitsspeicher; gespeicherte Nachweise sind redigiert."
+            },
+            {
+              eyebrow: "03 · SICHERHEIT ALS STANDARD",
+              title: "Ein kleiner Prototyp mit bewussten Schutzmaßnahmen.",
+              architecture: [
+                ["Browser-Oberfläche", "Drei Sprachen<br>Sitzungsbewusste Anfragen"],
+                ["Loopback-API", "Anmeldung · Rollen<br>CSRF- und Origin-Prüfung"],
+                ["Lokales SQLite", "Arbeitsbereichsdaten<br>Hash-verkettetes Audit"]
+              ],
+              bullets: [
+                "Scrypt-Passworthashes; ablaufende serverseitige Sitzungen; HttpOnly- und SameSite-Cookies.",
+                "Grenzen für ZIP-Größe, Einträge, Pfade, Symlinks, Verschlüsselung und Entpackvolumen.",
+                "Beim Deaktivieren werden Sitzungen beendet; die Audit-Prüfung erkennt Änderungen an der Kette."
+              ],
+              note: "Lokale Schutzmaßnahmen ersetzen weder PostgreSQL-RLS noch ein Security Review oder verwaltete Produktionsinfrastruktur."
+            },
+            {
+              eyebrow: "04 · UMSETZUNG",
+              title: "Wenige Abhängigkeiten. Klare Grenzen.",
+              cards: [
+                ["Backend", "Python-Standardbibliothek für HTTP, SQLite, ZIP-Prüfung und deterministische Regeln."],
+                ["Frontend", "Semantisches HTML, responsives CSS, Vanilla JavaScript und Lokalisierung in EN / DE / UZ."],
+                ["Qualität", "Unit- und HTTP-Tests ohne Zusatzpakete; Python-Compile- und JavaScript-Syntaxprüfung in CI."]
+              ],
+              callout: "Kein LLM-Anbieter und keine externen Laufzeitpakete. Die Analyse ist reproduzierbar, begrenzt und kein vollständiges Audit.",
+              note: "Die Lösung ist bewusst ein lokales MVP und behauptet nicht, den geplanten Enterprise-Stack umzusetzen."
+            },
+            {
+              eyebrow: "05 · VERIFIZIERUNG",
+              title: "Tests für die entscheidenden Fehlerfälle.",
+              cards: [
+                ["15 automatisierte Tests", "Analyse, Redigierung, ZIP-Schutz, Migration, Anmeldung und API-Abläufe."],
+                ["Mandanten und Rollen", "Mandantenübergreifender Zugriff, Auditor-Rechte, Admin-Grenzen und beendete Sitzungen."],
+                ["Nachweise und Berichte", "Menschliche Prüfung, druckbares HTML in mehreren Sprachen, SHA-256-Metadaten und Audit-Manipulationserkennung."]
+              ],
+              callout: "Im Browser geprüft: Arbeitsbereich, Admin-Anmeldung und Rollenoberfläche, synthetischer ZIP-Scan und deutscher Bericht.",
+              note: "Grüne lokale Tests belegen getestetes Prototypverhalten, aber keine Produktionsreife oder Rechtskonformität."
+            },
+            {
+              eyebrow: "06 · TRANSPARENTE GRENZEN",
+              title: "Nützlicher Prototyp. Kein Produktiv-Release.",
+              bullets: [
+                "Kein Java/Spring- und React-Enterprisebetrieb, keine PostgreSQL-RLS, MFA/OIDC oder verschlüsselte Objektspeicherung.",
+                "Keine verifizierte Rechtsdatenbank, kein validierter PII-Benchmark, keine PDF/A-Erzeugung und kein unabhängiger Penetrationstest.",
+                "Regex-Erkennung kann Befunde übersehen und Fehlalarme erzeugen; Redigierung ist keine Anonymisierung.",
+                "Nur lokal erreichbar. Keine vertraulichen, Kunden- oder echten personenbezogenen Daten hochladen."
+              ],
+              note: "Ein verantwortungsvolles Portfolio macht Einschränkungen sichtbar, statt Zertifizierung oder vollständige Rechtsabdeckung anzudeuten."
+            },
+            {
+              eyebrow: "07 · NÄCHSTE ETAPPEN",
+              title: "Verantwortungsvoller Weg vom Demo zum Produkt.",
+              cards: [
+                ["Architektur", "Spring-API, isolierter Python-Worker und PostgreSQL mit unabhängig getesteter Mandanten-RLS einführen."],
+                ["Qualität der Belege", "Juristisch geprüfte Wissensbasis pflegen und PII-Präzision / Recall mit einem dokumentierten Benchmark messen."],
+                ["Betrieb", "MFA/OIDC, Secret- und Schlüsselverwaltung, Backup-/Restore-Übungen, Monitoring und Threat-Model ergänzen."]
+              ],
+              closing: "Eine klare Engineering-Erzählung: Datenschutz als Standard, prüfbare Kontrollen und ehrliche Produktgrenzen.",
+              links: [["Lokal starten", "../README.md"], ["Technische Spezifikation", "../ReguGuard%20AI%20%E2%80%94%20Texnik%20vazifa%20(TZ)%20v1.0.md"]]
+            }
+          ]
+        },
+        uz: {
+          header: "Muhandislik portfoliolari",
+          previous: "Oldingi slayd", next: "Keyingi slayd", print: "Chop etish / PDF",
+          slides: [
+            {
+              eyebrow: "MUHANDISLIK PORTFOLIOSI · LOYIHA TAQDIMOTI",
+              title: "Muvofiqlikka tayyorgarlik — dalillar asosida.",
+              lead: "ReguGuard — dasturiy repozitoriylarni mahalliy tekshiradigan va inson ko‘rib chiqishi uchun muvofiqlik belgilarini jamlaydigan prototip.",
+              tags: ["Python standart kutubxonasi", "SQLite", "Vanilla JavaScript", "English · Deutsch · O‘zbekcha"],
+              note: "Bu portfolio loyihasi to‘liq mahalliy jarayonni namoyish etadi; production muvofiqlik platformasi emas."
+            },
+            {
+              eyebrow: "01 · MUAMMO",
+              title: "Muvofiqlik tekshiruvi sehrli ball emas, kontekst talab qiladi.",
+              cards: [
+                ["Muammo", "Faqat repozitoriy signallari qonuniy xavfni aniqlamaydi. Foydalanish maqsadi va ta’sirlanadigan odamlar muhim."],
+                ["Mahsulot qarori", "Use-case kontekstini yig‘ish, kodni ishonchsiz matn sifatida tekshirish va qarorni insonga qoldirish."],
+                ["Chegara", "Dastlabki tayyorgarlik bahosini berish; yuridik maslahat, rasmiy baholash yoki sertifikat emas."]
+              ],
+              note: "Loyiha doirasi noaniqlik va noto‘g‘ri ijobiy natijalarni yashirmaydi."
+            },
+            {
+              eyebrow: "02 · TO‘LIQ ISH JARAYONI",
+              title: "Mahalliy ZIP’dan inson tekshiradigan hisobotgacha.",
+              flow: [
+                ["Ish maydonini sozlash", "Birinchi owner hisobini yaratish va mahalliy akkaunt bilan kirish."],
+                ["Foydalanish maqsadini kiriting", "Soha, foydalanuvchilar, maqsad va muhim qarorlarga ta’sirini qayd etish."],
+                ["Xavfsiz skan", "Hajmi cheklangan ZIP matnlarini tekshirish; xavfli yo‘llarni rad etish va kodni hech qachon bajarmaslik."],
+                ["Tekshirish va hisobot", "Redaksiyalangan topilmalar, inson qarori, audit voqealari va chop etiladigan hisobot."]
+              ],
+              note: "Arxiv va manba fayllari skan vaqtida xotirada qoladi; saqlanadigan dalillar redaksiyalanadi."
+            },
+            {
+              eyebrow: "03 · XAVFSIZLIK ODATIY HOLATDA",
+              title: "Aniq himoya choralari bor ixcham prototip.",
+              architecture: [
+                ["Brauzer interfeysi", "Uchta til<br>Sessiyani hisobga olgan so‘rovlar"],
+                ["Loopback API", "Kirish · rollar<br>CSRF va Origin tekshiruvi"],
+                ["Mahalliy SQLite", "Ish maydoni ma’lumotlari<br>Xesh-zanjirli audit"]
+              ],
+              bullets: [
+                "Scrypt parol xeshlari; muddati tugaydigan server sessiyalari; HttpOnly va SameSite cookie’lari.",
+                "ZIP hajmi, fayl soni, yo‘llar, symlink, shifrlash va arxiv ochilish hajmi bo‘yicha limitlar.",
+                "A’zo faolsizlantirilganda sessiyalar bekor qilinadi; audit tekshiruvi zanjir o‘zgarishini aniqlaydi."
+              ],
+              note: "Mahalliy himoya PostgreSQL RLS, mustaqil xavfsizlik ko‘rigi yoki boshqariladigan production infratuzilmasini almashtirmaydi."
+            },
+            {
+              eyebrow: "04 · AMALGA OSHIRISH",
+              title: "Kam bog‘liqlik. Aniq chegaralar.",
+              cards: [
+                ["Backend", "Python standart kutubxonasidagi HTTP server, SQLite, ZIP tekshiruvi va deterministik qoidalar."],
+                ["Frontend", "Semantik HTML, moslashuvchan CSS, Vanilla JavaScript, EN / DE / UZ lokalizatsiyasi."],
+                ["Sifat", "Standart kutubxonadagi unit va HTTP testlari; CI’da Python kompilyatsiyasi va JavaScript sintaksisi."]
+              ],
+              callout: "LLM provayderi va tashqi ishga tushish bog‘liqliklari yo‘q. Tahlil takrorlanuvchi, cheklangan va to‘liq audit emas.",
+              note: "Yechim ataylab mahalliy MVP qilib qurilgan; rejalashtirilgan enterprise stack bajarildi deb da’vo qilinmaydi."
+            },
+            {
+              eyebrow: "05 · TEKSHIRUV",
+              title: "Muhim nosozlik holatlarini sinash.",
+              cards: [
+                ["15 ta avtomatik test", "Tahlil, redaksiya, ZIP himoyasi, migratsiya, autentifikatsiya va API jarayonlari."],
+                ["Tenant va rollar", "Tenantlararo kirish, auditor huquqlari, admin cheklovlari va bekor qilingan sessiyalar."],
+                ["Dalil va hisobot", "Inson tekshiruvi, lokalizatsiyalangan HTML hisobot, SHA-256 metadata va audit buzilishini aniqlash."]
+              ],
+              callout: "Brauzerda tekshirildi: ish maydonini sozlash, admin kirishi va rollar, sintetik ZIP skani, nemischa hisobot.",
+              note: "Mahalliy testlarning o‘tishi sinovdan o‘tgan prototip xatti-harakatini ko‘rsatadi, production tayyorligi yoki qonuniy muvofiqlikni emas."
+            },
+            {
+              eyebrow: "06 · OCHIQ CHEKLOVLAR",
+              title: "Foydali prototip. Production relizi emas.",
+              bullets: [
+                "Java/Spring va React enterprise yechimi, PostgreSQL RLS, MFA/OIDC hamda shifrlangan obyekt saqlash yo‘q.",
+                "Tasdiqlangan qonun bazasi, validatsiyalangan PII benchmarki, PDF/A yoki mustaqil pentest yo‘q.",
+                "Regex tekshiruvi muammolarni o‘tkazib yuborishi yoki noto‘g‘ri topilmalar berishi mumkin; redaksiya anonimlashtirish emas.",
+                "Faqat mahalliy kompyuterda ishlaydi. Maxfiy, mijozga tegishli yoki haqiqiy shaxsiy ma’lumot yuklamang."
+              ],
+              note: "Mas’uliyatli portfolio sertifikat yoki qonuniy qamrov haqida ortiqcha va’da bermay, cheklovlarni ochiq ko‘rsatadi."
+            },
+            {
+              eyebrow: "07 · KEYINGI BOSQICHLAR",
+              title: "Demo’dan mahsulotga mas’uliyatli yo‘l.",
+              cards: [
+                ["Arxitektura", "Spring API, izolyatsiyalangan Python worker va mustaqil sinovdan o‘tgan tenant RLS’li PostgreSQL."],
+                ["Dalil sifati", "Yurist ko‘rib chiqqan bilim bazasi; hujjatlashtirilgan benchmarkda PII precision / recall o‘lchovi."],
+                ["Ekspluatatsiya", "MFA/OIDC, maxfiy kalitlar boshqaruvi, backup/restore mashqlari, monitoring va tahdid modeli."]
+              ],
+              closing: "Aniq muhandislik hikoyasi: maxfiylik birlamchi, nazoratlar tekshiriladigan va mahsulot chegaralari rostgo‘y.",
+              links: [["Mahalliy ishga tushirish", "../README.md"], ["Texnik vazifa", "../ReguGuard%20AI%20%E2%80%94%20Texnik%20vazifa%20(TZ)%20v1.0.md"]]
+            }
+          ]
+        }
+      };
+
+      const deck = document.querySelector("#deck");
+      const counter = document.querySelector("#slide-counter");
+      const progress = document.querySelector("#progress");
+      const languageButtons = [...document.querySelectorAll("[data-language]")];
+      let language = "en";
+      let current = 0;
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (character) => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+        })[character]);
+      }
+
+      function renderCard([title, body]) {
+        return `<article class="card"><h3>${escapeHtml(title)}</h3><p>${escapeHtml(body)}</p></article>`;
+      }
+
+      function renderSlide(slide, index) {
+        const content = [
+          `<p class="eyebrow">${escapeHtml(slide.eyebrow)}</p>`,
+          `<h${index === 0 ? 1 : 2}>${escapeHtml(slide.title)}</h${index === 0 ? 1 : 2}>`,
+        ];
+        if (slide.lead) content.push(`<p class="lead">${escapeHtml(slide.lead)}</p>`);
+        if (slide.tags) content.push(`<div class="tag-row">${slide.tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>`);
+        if (slide.cards) content.push(`<div class="grid${slide.cards.length === 3 ? " three" : ""}">${slide.cards.map(renderCard).join("")}</div>`);
+        if (slide.flow) content.push(`<div class="flow">${slide.flow.map(renderCard).join("")}</div>`);
+        if (slide.architecture) content.push(`<div class="architecture">${slide.architecture.map(([title, body], itemIndex) => `${itemIndex ? '<span class="arrow" aria-hidden="true">→</span>' : ""}<div class="arch-box"><strong>${escapeHtml(title)}</strong><span>${body}</span></div>`).join("")}</div>`);
+        if (slide.bullets) content.push(`<ul>${slide.bullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`);
+        if (slide.callout) content.push(`<p class="callout">${escapeHtml(slide.callout)}</p>`);
+        if (slide.closing) content.push(`<p class="lead" style="margin-top:24px">${escapeHtml(slide.closing)}</p>`);
+        if (slide.links) content.push(`<div class="closing-links">${slide.links.map(([label, href]) => `<a href="${escapeHtml(href)}">${escapeHtml(label)} ↗</a>`).join("")}</div>`);
+        if (slide.note) content.push(`<p class="small" style="margin:22px 0 0">${escapeHtml(slide.note)}</p>`);
+        return `<section class="slide${index === current ? " active" : ""}" aria-label="${index + 1}">${content.join("")}</section>`;
+      }
+
+      function update() {
+        const copy = translations[language];
+        document.documentElement.lang = language;
+        document.title = `ReguGuard — ${copy.header}`;
+        document.querySelector("#header-label").textContent = copy.header;
+        document.querySelector("#previous").setAttribute("aria-label", copy.previous);
+        document.querySelector("#next").setAttribute("aria-label", copy.next);
+        document.querySelector("#print").textContent = copy.print;
+        languageButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.language === language)));
+        deck.innerHTML = copy.slides.map(renderSlide).join("");
+        const number = String(current + 1).padStart(2, "0");
+        counter.textContent = `${number} / ${String(copy.slides.length).padStart(2, "0")}`;
+        progress.style.width = `${((current + 1) / copy.slides.length) * 100}%`;
+      }
+
+      function navigate(delta) {
+        current = Math.max(0, Math.min(translations[language].slides.length - 1, current + delta));
+        update();
+      }
+
+      languageButtons.forEach((button) => button.addEventListener("click", () => {
+        language = button.dataset.language;
+        update();
+      }));
+      document.querySelector("#previous").addEventListener("click", () => navigate(-1));
+      document.querySelector("#next").addEventListener("click", () => navigate(1));
+      document.querySelector("#print").addEventListener("click", () => window.print());
+      document.addEventListener("keydown", (event) => {
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+        if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+          event.preventDefault();
+          navigate(1);
+        } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
+          event.preventDefault();
+          navigate(-1);
+        } else if (event.key === "Home") {
+          current = 0;
+          update();
+        } else if (event.key === "End") {
+          current = translations[language].slides.length - 1;
+          update();
+        }
+      });
+      update();
+    </script>
+  </body>
+</html>
