@@ -1,0 +1,11 @@
+body { max-width: 900px; margin: 40px auto; padding: 0 24px; color: #17233c; font: 16px/1.6 "Segoe UI", system-ui, sans-serif; }
+h1, h2, h3 { line-height: 1.25; }
+.warning { padding: 16px; border-left: 4px solid #d99020; background: #fff2dc; }
+.finding { margin: 16px 0; padding: 16px; border: 1px solid #dbe3ee; border-radius: 12px; break-inside: avoid; }
+pre { overflow-wrap: anywhere; white-space: pre-wrap; background: #f2f5f9; padding: 12px; border-radius: 8px; }
+.print-button { margin-bottom: 18px; padding: 10px 15px; border: 0; border-radius: 8px; background: #324fc4; color: white; font: inherit; cursor: pointer; }
+@media print {
+  body { max-width: none; margin: 0; padding: 0; }
+  .print-button { display: none; }
+  .finding { border-color: #b7c0d0; }
+}

@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f7fb">
+    <meta name="description" content="Privacy-first AI compliance readiness and gap screening.">
+    <title>ReguGuard — Compliance workspace</title>
+    <link rel="icon" href="/static/mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <section id="auth-screen" class="auth-screen" hidden>
+      <a class="brand auth-brand" href="/" aria-label="ReguGuard home"><span class="brand-mark">R</span><span><strong>reguguard</strong><small>TRUST, BUILT IN</small></span></a>
+      <div class="auth-card">
+        <div class="eyebrow" data-i18n="secureWorkspace">SECURE WORKSPACE</div>
+        <h1 id="auth-title" data-i18n="signIn">Sign in</h1>
+        <p id="auth-subtitle" data-i18n="signInSub">Access your compliance workspace.</p>
+        <div id="auth-error" class="auth-error" role="alert" hidden></div>
+        <form id="setup-form" hidden>
+          <label class="field-label" for="tenant-name" data-i18n="workspaceName">Workspace name</label>
+          <input id="tenant-name" name="tenant_name" required maxlength="120" autocomplete="organization">
+          <label class="field-label" for="setup-email" data-i18n="emailAddress">Email address</label>
+          <input id="setup-email" name="email" type="email" required maxlength="254" autocomplete="email">
+          <label class="field-label" for="setup-password" data-i18n="password">Password</label>
+          <input id="setup-password" name="password" type="password" required minlength="12" maxlength="256" autocomplete="new-password">
+          <p class="auth-hint" data-i18n="passwordHint">Use at least 12 characters. This becomes the workspace owner account.</p>
+          <button class="button button-primary auth-submit" type="submit" data-i18n="createWorkspace">Create workspace</button>
+        </form>
+        <form id="login-form" hidden>
+          <label class="field-label" for="login-email" data-i18n="emailAddress">Email address</label>
+          <input id="login-email" name="email" type="email" required maxlength="254" autocomplete="username">
+          <label class="field-label" for="login-password" data-i18n="password">Password</label>
+          <input id="login-password" name="password" type="password" required maxlength="256" autocomplete="current-password">
+          <button class="button button-primary auth-submit" type="submit" data-i18n="signIn">Sign in</button>
+        </form>
+        <p class="auth-footnote" data-i18n="authLocalOnly">Accounts are stored only in this local prototype database.</p>
+      </div>
+      <div class="auth-language"><label for="auth-language" data-i18n="language">Language</label><select id="auth-language"><option value="en">English</option><option value="de">Deutsch</option><option value="uz">O‘zbekcha</option></select></div>
+    </section>
+    <div class="app-shell" hidden>
+      <aside class="sidebar">
+        <a class="brand" href="/" aria-label="ReguGuard home">
+          <span class="brand-mark">R</span>
+          <span><strong>reguguard</strong><small>TRUST, BUILT IN</small></span>
+        </a>
+        <div class="workspace-label" data-i18n="workspace">WORKSPACE</div>
+        <nav class="navigation" aria-label="Main navigation">
+          <button class="nav-item active" data-view="overview"><span class="nav-icon">⌂</span><span data-i18n="overview">Overview</span></button>
+          <button class="nav-item" data-view="scans"><span class="nav-icon">◈</span><span data-i18n="scans">Scans & findings</span><span id="nav-scan-count" class="nav-count">0</span></button>
+          <button class="nav-item" data-view="new-scan"><span class="nav-icon">＋</span><span data-i18n="newScan">New assessment</span></button>
+          <button class="nav-item" data-view="team" id="team-nav" hidden><span class="nav-icon">♙</span><span data-i18n="teamAudit">Team & audit</span></button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="privacy-card">
+            <span class="privacy-icon">✳</span>
+            <strong data-i18n="privacyTitle">Private by default</strong>
+            <p data-i18n="privacyBody">Repository files are scanned locally and never sent to an AI provider.</p>
+            <span class="privacy-status"><i></i><span data-i18n="localMode">LOCAL MODE</span></span>
+          </div>
+          <div class="profile">
+            <div id="profile-avatar" class="avatar">R</div>
+            <div class="profile-copy"><strong id="profile-name"></strong><small id="profile-role"></small></div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="breadcrumbs"><span data-i18n="workspace">WORKSPACE</span><b>/</b><strong id="breadcrumb-current">Overview</strong></div>
+          <div class="top-actions">
+            <span class="environment-pill"><i></i><span data-i18n="localPrototype">Local prototype</span></span>
+            <label class="sr-only" for="language" data-i18n="language">Language</label>
+            <select id="language" class="language-select" aria-label="Language">
+              <option value="en">EN</option>
+              <option value="de">DE</option>
+              <option value="uz">UZ</option>
+            </select>
+            <span id="signed-in-email" class="signed-in-email"></span>
+            <button id="sign-out" class="button button-secondary sign-out" data-i18n="signOut">Sign out</button>
+          </div>
+        </header>
+
+        <div id="notice" class="notice" role="status" hidden></div>
+
+        <section id="view-overview" class="view">
+          <div class="page-heading heading-row">
+            <div><div class="eyebrow" data-i18n="overviewEyebrow">YOUR COMPLIANCE WORKSPACE</div><h1 data-i18n="welcome">Good morning</h1><p data-i18n="welcomeSub">A clearer view of your AI governance posture starts here.</p></div>
+            <button class="button button-primary" data-action="new-scan"><span>＋</span><span data-i18n="startAssessment">Start an assessment</span></button>
+          </div>
+
+          <div class="notice notice-info" role="note"><span class="notice-symbol">i</span><div><strong data-i18n="prototypeTitle">Local prototype · not production-ready</strong><p data-i18n="prototypeBody">Single-user demo only. No authentication or tenant isolation. Do not upload confidential or personal data.</p></div></div>
+
+          <div class="metric-grid">
+            <article class="metric-card"><div class="metric-top"><span data-i18n="totalScans">Total assessments</span><span class="metric-icon blue">◈</span></div><strong id="metric-scans">0</strong><small data-i18n="allTime">All time</small></article>
+            <article class="metric-card"><div class="metric-top"><span data-i18n="openFindings">Open findings</span><span class="metric-icon amber">⌕</span></div><strong id="metric-open">0</strong><small data-i18n="needReview">Need human review</small></article>
+            <article class="metric-card"><div class="metric-top"><span data-i18n="reviewed">Reviewed</span><span class="metric-icon green">✓</span></div><strong id="metric-reviewed">0</strong><small data-i18n="humanValidated">Human-validated findings</small></article>
+            <article class="metric-card"><div class="metric-top"><span data-i18n="latestRisk">Latest risk screen</span><span class="metric-icon violet">✳</span></div><strong id="metric-risk" class="risk-metric">—</strong><small data-i18n="indicativeOnly">Indicative · not legal advice</small></article>
+          </div>
+
+          <div class="content-grid">
+            <section class="panel">
+              <div class="panel-heading"><div><h2 data-i18n="recentAssessments">Recent assessments</h2><p data-i18n="recentSub">Your latest repository reviews</p></div><button class="text-button" data-action="show-scans"><span data-i18n="viewAll">View all</span> <span>→</span></button></div>
+              <div id="recent-scans" class="scan-list"><div class="empty-state"><div class="empty-symbol">◈</div><strong data-i18n="noAssessments">No assessments yet</strong><p data-i18n="noAssessmentsSub">Upload a ZIP archive to start your first review.</p><button class="button button-secondary" data-action="new-scan" data-i18n="startFirst">Start your first scan</button></div></div>
+            </section>
+            <section class="panel methodology-panel">
+              <div class="panel-heading"><div><h2 data-i18n="howItWorks">How it works</h2><p data-i18n="methodSub">Evidence first. People in control.</p></div><span class="method-icon">✳</span></div>
+              <div class="method-step"><span>01</span><div><strong data-i18n="stepOne">Share intended use</strong><p data-i18n="stepOneSub">Risk depends on how an AI system is used—not just its code.</p></div></div>
+              <div class="method-step"><span>02</span><div><strong data-i18n="stepTwo">Scan code privately</strong><p data-i18n="stepTwoSub">Rules inspect supported files on this machine. Source code is not retained.</p></div></div>
+              <div class="method-step"><span>03</span><div><strong data-i18n="stepThree">Review every signal</strong><p data-i18n="stepThreeSub">Findings are indicators for a human—not automated legal conclusions.</p></div></div>
+            </section>
+          </div>
+          <footer class="page-footer"><span data-i18n="footerNotice">ReguGuard is a readiness tool, not a certification or legal service.</span><span>KB <b>UNVERIFIED · DEMO</b></span></footer>
+        </section>
+
+        <section id="view-new-scan" class="view" hidden>
+          <div class="page-heading"><div class="eyebrow" data-i18n="assessmentSetup">ASSESSMENT SETUP</div><h1 data-i18n="newAssessmentTitle">Start an assessment</h1><p data-i18n="newAssessmentSub">Tell us how the system is intended to be used, then upload a source archive.</p></div>
+          <div class="form-layout">
+            <form id="scan-form" class="panel scan-form">
+              <div class="section-title"><span class="section-number">01</span><div><h2 data-i18n="useCase">Use-case context</h2><p data-i18n="useCaseSub">A risk screen needs context beyond code.</p></div></div>
+              <label class="field-label" for="project-name" data-i18n="projectName">Project name</label>
+              <input id="project-name" name="project_name" required maxlength="120" data-i18n-placeholder="projectPlaceholder" placeholder="e.g. Candidate matching platform">
+              <div class="field-row">
+                <div><label class="field-label" for="sector" data-i18n="sector">Sector</label>                <select id="sector" name="sector" required><option value="" data-i18n="selectSector">Select a sector</option><option value="general" data-i18n="general">General software</option><option value="hr" data-i18n="hr">HR & employment</option><option value="finance" data-i18n="finance">Finance & credit</option><option value="education" data-i18n="education">Education</option><option value="healthcare" data-i18n="healthcare">Healthcare</option><option value="public" data-i18n="public">Public services</option><option value="other" data-i18n="other">Other / unknown</option></select></div>
+                <div><label class="field-label" for="users" data-i18n="intendedUsers">Intended users</label><input id="users" name="users" maxlength="500" data-i18n-placeholder="usersPlaceholder" placeholder="e.g. Recruiters and hiring teams"></div>
+              </div>
+              <label class="field-label" for="purpose" data-i18n="purpose">Intended purpose</label>
+              <textarea id="purpose" name="purpose" required maxlength="2000" rows="4" data-i18n-placeholder="purposePlaceholder" placeholder="Describe what the system does, who uses it, and who may be affected."></textarea>
+              <label class="checkbox-row"><input type="checkbox" name="consequential_decisions" value="true"><span><strong data-i18n="consequentialTitle">Can it materially influence decisions about people?</strong><small data-i18n="consequentialSub">For example, access to a job, education, credit, healthcare or public services.</small></span></label>
+
+              <div class="section-divider"></div>
+              <div class="section-title"><span class="section-number">02</span><div><h2 data-i18n="repository">Repository archive</h2><p data-i18n="repositorySub">ZIP only · files are inspected locally and never executed.</p></div></div>
+              <label id="drop-zone" class="drop-zone" for="archive">
+                <input id="archive" name="file" type="file" accept=".zip,application/zip" required>
+                <span class="upload-icon">↑</span><strong data-i18n="dropTitle">Drop your ZIP archive here</strong><span data-i18n="dropSub">or browse files · max 25 MB</span><span id="file-name" class="file-name"></span>
+              </label>
+              <div class="form-footnote"><span class="lock-icon">⌑</span><span data-i18n="uploadFootnote">Source files are held in memory during the scan and are not saved to disk.</span></div>
+              <div class="form-actions"><button type="button" class="button button-secondary" data-action="overview" data-i18n="cancel">Cancel</button><button id="submit-scan" type="submit" class="button button-primary"><span data-i18n="runAssessment">Run assessment</span><span>→</span></button></div>
+            </form>
+            <aside class="side-note">
+              <div class="side-note-icon">✳</div><h3 data-i18n="scopeTitle">What this scan checks</h3>
+              <ul><li data-i18n="scopeOne">Potential credentials and exposed secrets</li><li data-i18n="scopeTwo">Email addresses and IBAN-like patterns</li><li data-i18n="scopeThree">AI framework and dataset references</li><li data-i18n="scopeFour">Possible special-category data indicators</li><li data-i18n="scopeFive">Basic technical documentation presence</li></ul>
+              <div class="side-note-warning"><strong data-i18n="scopeLimitTitle">Important limitation</strong><p data-i18n="scopeLimitBody">Pattern matching is not a full security or privacy audit. It can miss issues or flag false positives.</p></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="view-scans" class="view" hidden>
+          <div class="page-heading heading-row"><div><div class="eyebrow" data-i18n="assessmentHistory">ASSESSMENT HISTORY</div><h1 data-i18n="allAssessments">Scans & findings</h1><p data-i18n="allAssessmentsSub">Inspect results and record human review decisions.</p></div><button class="button button-primary" data-action="new-scan"><span>＋</span><span data-i18n="newAssessment">New assessment</span></button></div>
+          <section class="panel table-panel"><div class="panel-heading"><div><h2 data-i18n="allScans">All assessments</h2><p data-i18n="allScansSub">Most recent first</p></div><div class="filter-wrap"><span>⌕</span><input id="scan-filter" data-i18n-placeholder="searchProjects" placeholder="Search projects..." aria-label="Search projects"></div></div><div id="scan-table" class="table-wrap"></div></section>
+          <section id="scan-detail" class="panel detail-panel" hidden></section>
+        </section>
+
+        <section id="view-team" class="view" hidden>
+          <div class="page-heading"><div class="eyebrow" data-i18n="teamAudit">TEAM & AUDIT</div><h1 data-i18n="teamTitle">Workspace team</h1><p data-i18n="teamSubtitle">Manage workspace members and review the audit trail.</p></div>
+          <div class="content-grid">
+            <section class="panel">
+              <div class="panel-heading"><div><h2 data-i18n="members">Members</h2><p data-i18n="membersSub">Users belonging to this workspace</p></div></div>
+              <form id="invite-form" class="invite-form">
+                <input name="email" type="email" required maxlength="254" data-i18n-placeholder="emailAddress" placeholder="Email address">
+                <select name="role" aria-label="Role"><option value="compliance_officer" data-i18n="roleCompliance">Compliance officer</option><option value="developer" data-i18n="roleDeveloper">Developer</option><option value="auditor" data-i18n="roleAuditor">Auditor (read only)</option><option id="invite-admin-role" value="admin" data-i18n="roleAdmin">Admin</option></select>
+                <input name="password" type="password" required minlength="12" maxlength="256" data-i18n-placeholder="temporaryPassword" placeholder="Initial password">
+                <button class="button button-primary" type="submit" data-i18n="addMember">Add member</button>
+              </form>
+              <div id="team-list" class="table-wrap"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-heading"><div><h2 data-i18n="auditLog">Audit log</h2><p data-i18n="auditSub">Recent workspace security events</p></div></div>
+              <div id="audit-list" class="table-wrap"></div>
+            </section>
+          </div>
+        </section>
+
+        <footer class="global-footer"><span>© 2026 ReguGuard</span><span data-i18n="footerNotice">ReguGuard is a readiness tool, not a certification or legal service.</span><a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noreferrer">GDPR ↗</a></footer>
+      </main>
+    </div>
+  </body>
+</html>
